@@ -8,20 +8,14 @@ import android.widget.TextView;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
-import com.amazonaws.mobileconnectors.cognito.Dataset;
-import com.amazonaws.mobileconnectors.cognito.DefaultSyncCallback;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Regions;
-
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookSdk;
 import com.facebook.login.widget.LoginButton;
-import com.facebook.AccessToken;
-
 import com.sharukhhasan.studywise.R;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import butterknife.InjectView;
 
@@ -52,37 +46,21 @@ public class LoginActivity extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
-        loginButton = (LoginButton)findViewById(R.id.facebook_login_button);
+        loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
 
         // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(
-                getApplicationContext(),
-                "us-east-1:0a3b862e-4534-4a7a-b37a-3bd0a46bc67d", // Identity Pool ID
+        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(getApplicationContext(), "us-east-1:0a3b862e-4534-4a7a-b37a-3bd0a46bc67d", // Identity Pool ID
                 Regions.US_EAST_1 // Region
         );
 
         // Initialize the Cognito Sync client
-        CognitoSyncManager syncClient = new CognitoSyncManager(
-                getApplicationContext(),
-                Regions.US_EAST_1, // Region
+        CognitoSyncManager syncClient = new CognitoSyncManager(getApplicationContext(), Regions.US_EAST_1, // Region
                 credentialsProvider);
 
-        CognitoSyncClient syncClient = new DefaultCognitoSyncClient(myActivity.getContext(),
-                COGNITO_POOL_ID, cognitoProvider);
+        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
+        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
 
-        // Create a record in a dataset and synchronize with the server
-        Dataset dataset = syncClient.openOrCreateDataset("myDataset");
-        dataset.put("myKey", "myValue");
-        dataset.synchronize(new DefaultSyncCallback()
-        {
-            @Override
-            public void onSuccess(Dataset dataset, List newRecords)
-            {
-                //Your handler code here
-            }
-        });
-
-
-
+        CognitoSyncManager client = new CognitoSyncManager(getApplicationContext(), Regions.US_EAST_1, credentialsProvider);
+    }
 
 }
