@@ -39,6 +39,8 @@
 
         <activity android:name=".activities.HomeActivity">
         </activity>
+        <activity android:name=".activities.RegisterCoursesActivity">
+        </activity>
     </application>
 
 </manifest>
