@@ -29,48 +29,32 @@ import java.util.Arrays;
  */
 public class FacebookSignInProvider implements SignInProvider
 {
-    /** Log tag. */
     private static final String LOG_TAG = FacebookSignInProvider.class.getSimpleName();
-
-    /** The Cognito login key for Facebook to be used in the Cognito login Map. */
     public static final String COGNITO_LOGIN_KEY_FACEBOOK = "graph.facebook.com";
 
-    /** Facebook's callback manager. */
     private CallbackManager facebookCallbackManager;
 
-    /** User's name. */
     private String userName;
-
-    /** User's image Url. */
     private String userImageUrl;
 
-    /** Polling interval for checking refreshed token status */
     final static int REFRESH_TOKEN_POLLING_INTERVAL_MS = 50;
-
-    /** Number of retries to poll when refreshing the token. */
     final static int REFRESH_TOKEN_POLLING_RETRIES = 300; // 15 seconds
 
-    /**
-     * Constuctor. Intitializes the SDK and debug logs the app KeyHash that must be set up with
-     * the facebook backend to allow login from the app.
-     *
-     * @param context the context.
-     */
-    public FacebookSignInProvider(final Context context) {
-
-        if (!FacebookSdk.isInitialized()) {
+    public FacebookSignInProvider(final Context context)
+    {
+        if(!FacebookSdk.isInitialized())
+        {
             Log.d(LOG_TAG, "Initializing Facebook SDK...");
             FacebookSdk.sdkInitialize(context);
             Utils.logKeyHash(context);
         }
     }
 
-    /**
-     * @return the Facebook AccessToken when signed-in with a non-expired token.
-     */
-    private AccessToken getSignedInToken() {
+    private AccessToken getSignedInToken()
+    {
         final AccessToken accessToken = AccessToken.getCurrentAccessToken();
-        if (accessToken != null && !accessToken.isExpired()) {
+        if(accessToken != null && !accessToken.isExpired())
+        {
             Log.d(LOG_TAG, "Facebook Access Token is OK");
             return accessToken;
         }
@@ -79,26 +63,26 @@ public class FacebookSignInProvider implements SignInProvider
         return null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean isRequestCodeOurs(final int requestCode) {
+    public boolean isRequestCodeOurs(final int requestCode)
+    {
         return FacebookSdk.isFacebookRequestCode(requestCode);
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void handleActivityResult(final int requestCode, final int resultCode, final Intent data) {
+    public void handleActivityResult(final int requestCode, final int resultCode, final Intent data)
+    {
         facebookCallbackManager.onActivityResult(requestCode, resultCode, data);
     }
 
-    /** {@inheritDoc} */
     @Override
     public View.OnClickListener initializeSignInButton(final Activity signInActivity, final View buttonView,
                                                        final IdentityManager.SignInResultsHandler resultsHandler) {
 
         FacebookSdk.sdkInitialize(signInActivity);
 
-        if (buttonView == null) {
+        if(buttonView == null)
+        {
             throw new IllegalArgumentException("Facebook login button view not passed in.");
         }
 
@@ -106,19 +90,22 @@ public class FacebookSignInProvider implements SignInProvider
 
         LoginManager.getInstance().registerCallback(facebookCallbackManager, new FacebookCallback<LoginResult>() {
             @Override
-            public void onSuccess(LoginResult loginResult) {
+            public void onSuccess(LoginResult loginResult)
+            {
                 Log.d(LOG_TAG, "Facebook provider sign-in succeeded.");
                 resultsHandler.onSuccess(FacebookSignInProvider.this);
             }
 
             @Override
-            public void onCancel() {
+            public void onCancel()
+            {
                 Log.d(LOG_TAG, "Facebook provider sign-in canceled.");
                 resultsHandler.onCancel(FacebookSignInProvider.this);
             }
 
             @Override
-            public void onError(FacebookException exception) {
+            public void onError(FacebookException exception)
+            {
                 Log.e(LOG_TAG, "Facebook provider sign-in error: " + exception.getMessage());
                 resultsHandler.onError(FacebookSignInProvider.this, exception);
             }
@@ -126,9 +113,9 @@ public class FacebookSignInProvider implements SignInProvider
 
         final View.OnClickListener listener = new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                LoginManager.getInstance().logInWithReadPermissions(signInActivity,
-                        Arrays.asList("public_profile"));
+            public void onClick(View v)
+            {
+                LoginManager.getInstance().logInWithReadPermissions(signInActivity, Arrays.asList("public_profile"));
             }
         };
 
@@ -136,50 +123,53 @@ public class FacebookSignInProvider implements SignInProvider
         return listener;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getDisplayName() {
+    public String getDisplayName()
+    {
         return "Facebook";
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getCognitoLoginKey() {
+    public String getCognitoLoginKey()
+    {
         return COGNITO_LOGIN_KEY_FACEBOOK;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public boolean isUserSignedIn() {
+    public boolean isUserSignedIn()
+    {
         return getSignedInToken() != null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getToken() {
+    public String getToken()
+    {
         AccessToken accessToken = getSignedInToken();
-        if (accessToken != null) {
+        if(accessToken != null)
+        {
             return accessToken.getToken();
         }
         return null;
     }
 
     @Override
-    public String refreshToken() {
+    public String refreshToken()
+    {
         AccessToken accessToken = getSignedInToken();
-        // getSignedInToken() returns null if token is expired.
-        if (accessToken == null) {
+
+        if(accessToken == null)
+        {
             ThreadUtils.runOnUiThread(new Runnable() {
                 @Override
-                public void run() {
-                    // refreshes access token in the background.
+                public void run()
+                {
                     AccessToken.refreshCurrentAccessTokenAsync();
                 }
             });
 
-            // There is no method to check the status of the refresh operation, so we have to resort to polling.
             int retries = 0;
-            while (accessToken == null && (retries++ < REFRESH_TOKEN_POLLING_RETRIES)) {
+            while(accessToken == null && (retries++ < REFRESH_TOKEN_POLLING_RETRIES))
+            {
                 try {
                     Thread.sleep(REFRESH_TOKEN_POLLING_INTERVAL_MS);
                 } catch (final InterruptedException ex) {
@@ -188,41 +178,44 @@ public class FacebookSignInProvider implements SignInProvider
                 }
                 accessToken = getSignedInToken();
             }
-            if (accessToken == null) {
+            if(accessToken == null)
+            {
                 return null;
             }
         }
         return accessToken.getToken();
     }
 
-    /** {@inheritDoc} */
     @Override
-    public void signOut() {
+    public void signOut()
+    {
         clearUserInfo();
         LoginManager.getInstance().logOut();
     }
 
-    private void clearUserInfo() {
+    private void clearUserInfo()
+    {
         userName = null;
         userImageUrl = null;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getUserName() {
+    public String getUserName()
+    {
         return userName;
     }
 
-    /** {@inheritDoc} */
     @Override
-    public String getUserImageUrl() {
+    public String getUserImageUrl()
+    {
         return userImageUrl;
     }
 
-    /** {@inheritDoc} */
-    public void reloadUserInfo() {
+    public void reloadUserInfo()
+    {
         clearUserInfo();
-        if (!isUserSignedIn()) {
+        if(!isUserSignedIn())
+        {
             return;
         }
 
@@ -240,10 +233,7 @@ public class FacebookSignInProvider implements SignInProvider
                     .getString("url");
 
         } catch (final JSONException jsonException) {
-            Log.e(LOG_TAG,
-                    "Unable to get Facebook user info. " + jsonException.getMessage() + "\n" + response,
-                    jsonException);
-            // Nothing much we can do here.
+            Log.e(LOG_TAG, "Unable to get Facebook user info. " + jsonException.getMessage() + "\n" + response, jsonException);
         }
     }
 }

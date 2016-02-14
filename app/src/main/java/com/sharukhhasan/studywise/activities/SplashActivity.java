@@ -24,31 +24,25 @@ public class SplashActivity extends Activity
     /**
      * SignInResultsHandler handles the results from sign-in for a previously signed in user.
      */
-    private class SignInResultsHandler implements IdentityManager.SignInResultsHandler {
-        /**
-         * Receives the successful sign-in result for an alraedy signed in user and starts the main
-         * activity.
-         * @param provider the identity provider used for sign-in.
-         */
+    private class SignInResultsHandler implements IdentityManager.SignInResultsHandler
+    {
         @Override
-        public void onSuccess(final IdentityProvider provider) {
-            Log.d(LOG_TAG, String.format("User sign-in with previous %s provider succeeded",
-                    provider.getDisplayName()));
+        public void onSuccess(final IdentityProvider provider)
+        {
+            Log.d(LOG_TAG, String.format("User sign-in with previous %s provider succeeded", provider.getDisplayName()));
 
-            // The sign-in manager is no longer needed once signed in.
             SignInManager.dispose();
 
-            Toast.makeText(SplashActivity.this, String.format("Sign-in with %s succeeded.",
-                    provider.getDisplayName()), Toast.LENGTH_LONG).show();
+            Toast.makeText(SplashActivity.this, String.format("Sign-in with %s succeeded.", provider.getDisplayName()), Toast.LENGTH_LONG).show();
 
-            AWSMobileClient.defaultMobileClient()
-                    .getIdentityManager()
-                    .loadUserInfoAndImage(provider, new Runnable() {
-                        @Override
-                        public void run() {
-                            goMain();
-                        }
-                    });
+            AWSMobileClient.defaultMobileClient().getIdentityManager().loadUserInfoAndImage(provider, new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    goMain();
+                }
+            });
         }
 
         /**
@@ -58,7 +52,8 @@ public class SplashActivity extends Activity
          * @param provider the identity provider with which the user attempted sign-in.
          */
         @Override
-        public void onCancel(final IdentityProvider provider) {
+        public void onCancel(final IdentityProvider provider)
+        {
             Log.wtf(LOG_TAG, "Cancel can't happen when handling a previously sign-in user.");
         }
 
@@ -69,47 +64,40 @@ public class SplashActivity extends Activity
          * @param ex the exception that occurred.
          */
         @Override
-        public void onError(final IdentityProvider provider, Exception ex) {
-            Log.e(LOG_TAG,
-                    String.format("Cognito credentials refresh with %s provider failed. Error: %s",
-                            provider.getDisplayName(), ex.getMessage()), ex);
-
-            Toast.makeText(SplashActivity.this, String.format("Sign-in with %s failed.",
-                    provider.getDisplayName()), Toast.LENGTH_LONG).show();
-            goSignIn();
-
+        public void onError(final IdentityProvider provider, Exception ex)
+        {
+            Log.e(LOG_TAG, String.format("Cognito credentials refresh with %s provider failed. Error: %s", provider.getDisplayName(), ex.getMessage()), ex);
+            Toast.makeText(SplashActivity.this, String.format("Sign-in with %s failed.", provider.getDisplayName()), Toast.LENGTH_LONG).show();
+            goLogIn();
         }
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         Log.d(LOG_TAG, "onCreate");
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
+            public void run()
+            {
                 signInManager = SignInManager.getInstance(SplashActivity.this);
-
                 final SignInProvider provider = signInManager.getPreviouslySignedInProvider();
 
-                // if the user was already previously in to a provider.
-                if (provider != null) {
-                    // asynchronously handle refreshing credentials and call our handler.
-                    signInManager.refreshCredentialsWithProvider(SplashActivity.this,
-                            provider, new SignInResultsHandler());
-                } else {
-                    // Asyncronously go to the sign-in page (after the splash delay has expired).
-                    goSignIn();
+                if(provider != null)
+                {
+                    signInManager.refreshCredentialsWithProvider(SplashActivity.this, provider, new SignInResultsHandler());
+                }
+                else
+                {
+                    goLogIn();
                 }
 
-                // Wait for the splash timeout.
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) { }
 
-                // Expire the splash page delay.
                 timeoutLatch.countDown();
             }
         });
@@ -117,29 +105,26 @@ public class SplashActivity extends Activity
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        // Touch event bypasses waiting for the splash timeout to expire.
+    public boolean onTouchEvent(MotionEvent event)
+    {
         timeoutLatch.countDown();
         return true;
     }
 
-    /**
-     * Starts an activity after the splash timeout.
-     * @param intent the intent to start the activity.
-     */
-    private void goAfterSplashTimeout(final Intent intent) {
+    private void goAfterSplashTimeout(final Intent intent)
+    {
         final Thread thread = new Thread(new Runnable() {
-            public void run() {
-                // wait for the splash timeout expiry or for the user to tap.
+            public void run()
+            {
                 try {
                     timeoutLatch.await();
                 } catch (InterruptedException e) {
                 }
 
                 SplashActivity.this.runOnUiThread(new Runnable() {
-                    public void run() {
+                    public void run()
+                    {
                         startActivity(intent);
-                        // finish should always be called on the main thread.
                         finish();
                     }
                 });
@@ -148,18 +133,14 @@ public class SplashActivity extends Activity
         thread.start();
     }
 
-    /**
-     * Go to the main activity after the splash timeout has expired.
-     */
-    protected void goMain() {
+    protected void goMain()
+    {
         Log.d(LOG_TAG, "Launching Main Activity...");
         goAfterSplashTimeout(new Intent(this, HomeActivity.class));
     }
 
-    /**
-     * Go to the sign in activity after the splash timeout has expired.
-     */
-    protected void goSignIn() {
+    protected void goLogIn()
+    {
         Log.d(LOG_TAG, "Launching Sign-in Activity...");
         goAfterSplashTimeout(new Intent(this, LoginActivity.class));
     }

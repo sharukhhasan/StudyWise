@@ -21,15 +21,16 @@ public class Utils
 
         try {
             Log.d(LOG_TAG_KEY_HASH, "PackageName: " + context.getPackageName());
-            PackageInfo info = context.getPackageManager().getPackageInfo(
-                    context.getPackageName(),
-                    PackageManager.GET_SIGNATURES);
-            for (Signature signature : info.signatures) {
+            PackageInfo info = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+
+            for(Signature signature : info.signatures)
+            {
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signature.toByteArray());
                 Log.d(LOG_TAG_KEY_HASH, "SHA1 B64: " + Base64.encodeToString(md.digest(), Base64.DEFAULT));
                 StringBuilder sb = new StringBuilder();
-                for (int b : md.digest()) {
+                for(int b : md.digest())
+                {
                     b &= 0xFF;
                     sb.append((b < 16) ? ("0" + Integer.toHexString(b)) : Integer.toHexString(b));
                     sb.append(":");

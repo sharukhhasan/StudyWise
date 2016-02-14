@@ -3,6 +3,8 @@ package com.sharukhhasan.studywise.activities;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.sharukhhasan.studywise.R;
+
 public class HomeActivity extends AppCompatActivity
 {
 

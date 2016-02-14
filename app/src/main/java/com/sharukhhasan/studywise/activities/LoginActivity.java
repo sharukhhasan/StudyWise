@@ -6,14 +6,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
-import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.sharukhhasan.studywise.R;
 
@@ -48,19 +45,23 @@ public class LoginActivity extends AppCompatActivity
 
         loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
 
-        // Initialize the Amazon Cognito credentials provider
-        CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(getApplicationContext(), "us-east-1:0a3b862e-4534-4a7a-b37a-3bd0a46bc67d", // Identity Pool ID
-                Regions.US_EAST_1 // Region
-        );
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                // App code
+            }
 
-        // Initialize the Cognito Sync client
-        CognitoSyncManager syncClient = new CognitoSyncManager(getApplicationContext(), Regions.US_EAST_1, // Region
-                credentialsProvider);
+            @Override
+            public void onCancel() {
+                // App code
+            }
 
-        AmazonS3 s3 = new AmazonS3Client(credentialsProvider);
-        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
+            @Override
+            public void onError(FacebookException exception) {
+                // App code
+            }
+        });
 
-        CognitoSyncManager client = new CognitoSyncManager(getApplicationContext(), Regions.US_EAST_1, credentialsProvider);
     }
 
 }
