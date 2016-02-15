@@ -2,7 +2,6 @@ package com.sharukhhasan.studywise.helpers;
 
 import android.app.Activity;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
@@ -48,7 +47,6 @@ public class GooglePlusSignInHelper implements GoogleApiClient.ConnectionCallbac
     // Used to store the error code most recently returned by Google Play services
     // until the user clicks 'sign in'.
     private int mSignInError;
-    // Activity instance
     private Activity mActivity;
     /**
      * Google + sign in Listener
