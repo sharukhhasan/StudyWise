@@ -2,9 +2,6 @@ package com.sharukhhasan.studywise.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -12,9 +9,9 @@ import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.sharukhhasan.studywise.R;
-
-import butterknife.InjectView;
 
 public class LoginActivity extends AppCompatActivity
 {
@@ -25,14 +22,7 @@ public class LoginActivity extends AppCompatActivity
 
     private LoginButton loginButton;
     private CallbackManager callbackManager;
-
-    @InjectView(R.id.input_username)
-    EditText usernameInput;
-    @InjectView(R.id.input_password) EditText passwordInput;
-    @InjectView(R.id.btn_login)
-    Button _loginButton;
-    @InjectView(R.id.link_signup)
-    TextView _signupLink;
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -43,7 +33,10 @@ public class LoginActivity extends AppCompatActivity
         FacebookSdk.sdkInitialize(getApplicationContext());
         callbackManager = CallbackManager.Factory.create();
 
-        loginButton = (LoginButton) findViewById(R.id.facebook_login_button);
+        loginButton = (LoginButton) findViewById(R.id.login_facebook);
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
+        //mGoogleApiClient = new GoogleApiClient.Builder(this).enableAutoManage(this, this).addApi(Auth.GOOGLE_SIGN_IN_API, gso).build();
 
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
