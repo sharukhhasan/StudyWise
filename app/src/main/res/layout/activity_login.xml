@@ -4,46 +4,44 @@
                 android:layout_height="match_parent"
                 tools:context=".activities.LoginActivity">
 
-<LinearLayout
-    android:id="@+id/login_layout"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_centerInParent="true"
-    android:gravity="center_horizontal">
-
-    <ImageView
-        android:src="@drawable/logo"
-        android:layout_width="wrap_content"
-        android:layout_height="72dp"
-        android:layout_marginBottom="24dp"
-        android:layout_gravity="center_horizontal" />
-
-    <ImageButton
-        android:id="@+id/login_google"
+    <LinearLayout
+        android:id="@+id/login_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/google"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="10dp"
-        />
+        android:orientation="vertical"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal">
 
-    <ImageButton
-        android:id="@+id/login_facebook"
+        <ImageView
+            android:src="@drawable/logo"
+            android:layout_width="wrap_content"
+            android:layout_height="72dp"
+            android:layout_marginBottom="24dp"
+            android:layout_gravity="center_horizontal" />
+
+        <ImageButton
+            android:id="@+id/login_facebook"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/facebook"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="10dp"/>
+
+        <ImageButton
+            android:id="@+id/login_google"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/google"
+            android:background="@android:color/transparent"
+            android:layout_marginTop="10dp"/>
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/facebook"
-        android:background="@android:color/transparent"
-        android:layout_marginTop="10dp"
-        />
-
-</LinearLayout>
-
-<ProgressBar
-    android:id="@+id/progress_bar"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerInParent="true"
-    android:visibility="gone"/>
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
 </RelativeLayout>
 
